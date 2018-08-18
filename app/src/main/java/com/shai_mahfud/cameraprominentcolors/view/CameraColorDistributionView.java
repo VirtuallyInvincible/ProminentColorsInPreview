@@ -32,6 +32,7 @@ import java.util.TreeMap;
 @SuppressWarnings("deprecation")
 public class CameraColorDistributionView extends LinearLayout implements Camera.PreviewCallback {
     private static final int TIME_BETWEEN_COLOR_PROCESSING = 1000;
+    private static final int MAX_POSSIBLE_PROMINENT_COLORS = 16;
 
 
     private long prevTime = -1;
@@ -102,19 +103,27 @@ public class CameraColorDistributionView extends LinearLayout implements Camera.
             public void onGenerated(Palette palette) {
                 initDataStructures();
                 calcMostProminentData(palette.getSwatches());
+                // TODO: Consider using ViewModel and LiveData to update the RecyclerView data when
+                // it changes instead of using a Handler and a Runnable from within this callback.
+                // For a neater solution, all the calculations and this callback should perhaps be
+                // moved to the ViewModel class. This will also make the data updating process
+                // lifecycle aware, because LiveData is lifecycle aware.
                 updateUIHandler.post(updateUITask);
             }
         });
     }
 
     void insertItems(Context ctx, int numOfItems) {
-        this.numOfItems = numOfItems;
-        for (int i = 0; i < numOfItems; i++) {
+        this.numOfItems = (numOfItems <= MAX_POSSIBLE_PROMINENT_COLORS ? numOfItems :
+                MAX_POSSIBLE_PROMINENT_COLORS);
+        // TODO: Use RecyclerView instead of creating the Views in code. This will help supporting
+        // more than 5 items by scrolling vertically.
+        for (int i = 0; i < this.numOfItems; i++) {
             ColorDistributionItem item = new ColorDistributionItem(ctx);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, 0);
             lp.weight = 1;
-            if (i < numOfItems - 1) {
+            if (i < this.numOfItems - 1) {
                 lp.bottomMargin = (int) ctx.getResources().getDimension(
                         R.dimen.color_distribution_item_margin_bottom);
             }
