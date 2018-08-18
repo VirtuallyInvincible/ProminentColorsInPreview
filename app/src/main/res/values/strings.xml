@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Dominant Colors</string>
+    <string name="no_permission_message">The application must have permission to use the camera</string>
+    <string name="go_to_permissions">OPEN PERMISSIONS SCREEN</string>
+</resources>

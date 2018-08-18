@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <!-- Nesting LinearLayouts which use weights is bad for performance, but in this case, the
+     number of ColorDistributionItems is fixed and small (5), so the impact is very small -->
+    <TextView
+        android:id="@+id/color_distribution_item_color_bar"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="2"
+        android:padding="@dimen/color_distribution_item_rectangle_padding"
+        android:gravity="center"
+        />
+    <TextView
+        android:id="@+id/color_distribution_item_rgb"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:textSize="@dimen/color_distribution_item_distribution_text_size"
+        android:gravity="center"
+        />
+
+</LinearLayout>
