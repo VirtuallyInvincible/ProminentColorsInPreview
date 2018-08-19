@@ -11,6 +11,11 @@
         android:theme="@style/AppTheme"
         >
 
+        <service
+            android:name=".services.FrameDiagnosisService"
+            android:exported="false"
+            />
+
         <activity
             android:name=".view.MainActivity"
             android:screenOrientation="landscape"
