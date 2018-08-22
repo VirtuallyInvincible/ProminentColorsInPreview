@@ -10,6 +10,7 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -37,7 +38,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Camera camera;
     private SurfaceView surfaceView;
     private CameraColorDistributionView colorDistributionContainer;
+    private FloatingActionButton fab;
     private boolean snackbarShown = false;
+    private boolean resumePlaying = false;
 
 
     @Override
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         surfaceView = findViewById(R.id.activity_main_surface_view);
         colorDistributionContainer = findViewById(R.id.activity_main_color_distribution);
+        fab = findViewById(R.id.fab);
+
+        fab.setOnClickListener(this);
 
         colorDistributionContainer.insertItems(this, NUM_OF_COLOR_DISTRIBUTIONS);
 
@@ -119,11 +125,28 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     @Override
     public void onClick(View view) {
-        if (view != null && view instanceof AppCompatButton) {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.fromParts("package", getPackageName(), null));
-            startActivityForResult(intent, APP_PERMISSIONS_REQUEST_CODE);
-            snackbarShown = false;
+        int id = view.getId();
+        switch (id) {
+            case R.id.fab:
+                resumePlaying = !resumePlaying;
+                int newIcon = resumePlaying ? R.drawable.play : R.drawable.pause;
+                fab.setImageResource(newIcon);
+                if (resumePlaying) {
+                    camera.setPreviewCallback(null);
+                    camera.stopPreview();
+                } else {
+                    camera.setPreviewCallback(colorDistributionContainer);
+                    camera.startPreview();
+                }
+                break;
+            default:
+                if (view != null && view instanceof AppCompatButton) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", getPackageName(), null));
+                    startActivityForResult(intent, APP_PERMISSIONS_REQUEST_CODE);
+                    snackbarShown = false;
+                }
+                break;
         }
     }
 

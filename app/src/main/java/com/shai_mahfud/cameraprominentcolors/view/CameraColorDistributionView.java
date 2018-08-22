@@ -49,7 +49,7 @@ public class CameraColorDistributionView extends LinearLayout implements Camera.
 
 
     private static final int MAX_POSSIBLE_PROMINENT_COLORS = 16;
-    private static final int TIME_BETWEEN_COLOR_PROCESSING = 1000;
+    private static final int TIME_BETWEEN_COLOR_PROCESSING = 10000;
 
 
     private ViewGroup root;
@@ -85,8 +85,10 @@ public class CameraColorDistributionView extends LinearLayout implements Camera.
                 FrameDiagnosisService.data != null) {
             return;
         }
-        FrameDiagnosisService.data = data;
         prevTime = curTime;
+
+        // Can't pass the data using Intent. Doing so yields a TransactionTooLargeException
+        FrameDiagnosisService.data = data;
 
         Intent intent = new Intent(getContext(), FrameDiagnosisService.class);
         Messenger messenger = new Messenger(new UpdateUIHandler());

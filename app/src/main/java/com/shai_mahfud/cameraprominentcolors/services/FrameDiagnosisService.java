@@ -36,9 +36,9 @@ public class FrameDiagnosisService extends IntentService {
     }
 
 
+    public static final int NUM_OF_COLORS = 16;
     public static final String KEY_MESSENGER = "KEY_MESSENGER";
     public static final String KEY_NUM_OF_ITEMS = "KEY_NUM_OF_ITEMS";
-    public static final String KEY_FRAME_DATA_KEY = "KEY_FRAME_DATA_KEY";
     public static final String KEY_CAMERA_PREVIEW_FRAME_FORMAT = "KEY_CAMERA_PREVIEW_FRAME_FORMAT";
     public static final String KEY_CAMERA_PREVIEW_FRAME_WIDTH = "KEY_CAMERA_PREVIEW_FRAME_WIDTH";
     public static final String KEY_CAMERA_PREVIEW_FRAME_HEIGHT = "KEY_CAMERA_PREVIEW_FRAME_HEIGHT";
@@ -69,11 +69,6 @@ public class FrameDiagnosisService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable final Intent intent) {
-        if (intent == null || data == null) {
-            data = null;
-            return;
-        }
-
         this.numOfItems = intent.getIntExtra(KEY_NUM_OF_ITEMS, 1);
 
         int frameFormat = intent.getIntExtra(KEY_CAMERA_PREVIEW_FRAME_FORMAT, -1);
@@ -83,13 +78,19 @@ public class FrameDiagnosisService extends IntentService {
         frameData.format = frameFormat;
         frameData.width = frameWidth;
         frameData.height = frameHeight;
-        Bitmap bitmap = decodePreviewToBitmap(data, frameData);
+        Bitmap bitmap = null;
+        try {
+            bitmap = decodePreviewToBitmap(data, frameData);
+        } catch (IllegalArgumentException ignore) {
+        }
         if (bitmap == null) {
             data = null;
             return;
         }
 
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+        Palette.from(bitmap)
+                .maximumColorCount(NUM_OF_COLORS)
+                .generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette palette) {
                 initDataStructures();
                 calcMostProminentData(palette.getSwatches());
